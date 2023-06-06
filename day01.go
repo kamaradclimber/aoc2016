@@ -18,6 +18,10 @@ type Pos struct {
 	y int
 }
 
+func manhattan(p Pos) int {
+	return abs(p.x) + abs(p.y)
+}
+
 func checkDuplicate(positions map[Pos]bool, pos Pos) bool {
 	if positions[pos] {
 		return true
@@ -35,10 +39,10 @@ func main() {
 	instructions := strings.Split(strings.TrimSuffix(string(content), "\n"), ", ")
 
 	var direction int = 0
-	var x, y int = 0, 0
+	var cur_pos = Pos{0, 0}
 
 	var positions = make(map[Pos]bool)
-	positions[Pos{x, y}] = true
+	positions[cur_pos] = true
 
 	var part2_found = false
 
@@ -57,43 +61,34 @@ func main() {
 			log.Fatal(fmt.Sprintf("Impossible to parse %s as a int", instruction[1:]))
 		}
 		// fmt.Printf("Instruction was: rotate %s and then walk %d steps\n", string(instruction[0]), steps)
+		var mover func(Pos) Pos
 		switch direction {
 		case 0:
-			for i := 0; i < steps; i++ {
-				y -= 1
-				if checkDuplicate(positions, Pos{x, y}) && !part2_found {
-					part2_found = true
-					fmt.Printf("Part2: %d\n", abs(x)+abs(y))
-				}
+			mover = func(p Pos) Pos {
+				return Pos{p.x, p.y - 1}
 			}
 		case 2:
-			for i := 0; i < steps; i++ {
-				y += 1
-				if checkDuplicate(positions, Pos{x, y}) && !part2_found {
-					part2_found = true
-					fmt.Printf("Part2: %d\n", abs(x)+abs(y))
-				}
+			mover = func(p Pos) Pos {
+				return Pos{p.x, p.y + 1}
 			}
 		case 1:
-			for i := 0; i < steps; i++ {
-				x += 1
-				if checkDuplicate(positions, Pos{x, y}) && !part2_found {
-					part2_found = true
-					fmt.Printf("Part2: %d\n", abs(x)+abs(y))
-				}
+			mover = func(p Pos) Pos {
+				return Pos{p.x + 1, p.y}
 			}
 		case 3:
-			for i := 0; i < steps; i++ {
-				x -= 1
-				if checkDuplicate(positions, Pos{x, y}) && !part2_found {
-					part2_found = true
-					fmt.Printf("Part2: %d\n", abs(x)+abs(y))
-				}
+			mover = func(p Pos) Pos {
+				return Pos{p.x - 1, p.y}
 			}
 		default:
 			log.Fatal(fmt.Sprintf("Unknown direction %d, something is really really wrong", direction))
 		}
+		for i := 0; i < steps; i++ {
+			cur_pos = mover(cur_pos)
+			if checkDuplicate(positions, cur_pos) && !part2_found {
+				part2_found = true
+				fmt.Printf("Part2: %d\n", manhattan(cur_pos))
+			}
+		}
 	}
-	manhattan := abs(x) + abs(y)
-	fmt.Printf("Part1: %d\n", manhattan)
+	fmt.Printf("Part1: %d\n", manhattan(cur_pos))
 }
