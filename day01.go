@@ -13,6 +13,19 @@ func abs(n int) int {
 	return n
 }
 
+type Pos struct {
+	x int
+	y int
+}
+
+func checkDuplicate(positions map[Pos]bool, pos Pos) bool {
+	if positions[pos] {
+		return true
+	}
+	positions[pos] = true
+	return false
+}
+
 func main() {
 	content, err := os.ReadFile("input01.txt")
 	if err != nil {
@@ -23,6 +36,11 @@ func main() {
 
 	var direction int = 0
 	var x, y int = 0, 0
+
+	var positions = make(map[Pos]bool)
+	positions[Pos{x, y}] = true
+
+	var part2_found = false
 
 	for _, instruction := range instructions {
 		switch instruction[0] {
@@ -38,16 +56,40 @@ func main() {
 		if err != nil {
 			log.Fatal(fmt.Sprintf("Impossible to parse %s as a int", instruction[1:]))
 		}
-		fmt.Printf("Instruction was: rotate %s and then walk %d steps\n", string(instruction[0]), steps)
+		// fmt.Printf("Instruction was: rotate %s and then walk %d steps\n", string(instruction[0]), steps)
 		switch direction {
 		case 0:
-			y -= steps
+			for i := 0; i < steps; i++ {
+				y -= 1
+				if checkDuplicate(positions, Pos{x, y}) && !part2_found {
+					part2_found = true
+					fmt.Printf("Part2: %d\n", abs(x)+abs(y))
+				}
+			}
 		case 2:
-			y += steps
+			for i := 0; i < steps; i++ {
+				y += 1
+				if checkDuplicate(positions, Pos{x, y}) && !part2_found {
+					part2_found = true
+					fmt.Printf("Part2: %d\n", abs(x)+abs(y))
+				}
+			}
 		case 1:
-			x += steps
+			for i := 0; i < steps; i++ {
+				x += 1
+				if checkDuplicate(positions, Pos{x, y}) && !part2_found {
+					part2_found = true
+					fmt.Printf("Part2: %d\n", abs(x)+abs(y))
+				}
+			}
 		case 3:
-			x -= steps
+			for i := 0; i < steps; i++ {
+				x -= 1
+				if checkDuplicate(positions, Pos{x, y}) && !part2_found {
+					part2_found = true
+					fmt.Printf("Part2: %d\n", abs(x)+abs(y))
+				}
+			}
 		default:
 			log.Fatal(fmt.Sprintf("Unknown direction %d, something is really really wrong", direction))
 		}
