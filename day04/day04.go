@@ -39,8 +39,11 @@ func main() {
 		}
 		if room.valid() {
 			part1 += room.sector_id
+			if room.decrypt() == "northpole object storage" {
+				log.Print(fmt.Sprintf("Part 2: %d", room.sector_id))
+			}
 		} else {
-			log.Print(room, "is not a valid room")
+			// log.Print(room, "is not a valid room")
 		}
 	}
 	log.Print(fmt.Sprintf("Part 1: %d", part1))
@@ -60,6 +63,19 @@ func parseRoom(line string) (Room, error) {
 	} else {
 		return Room{}, InvalidRoom{line}
 	}
+}
+
+func (room Room) decrypt() string {
+	var decrypted = make([]byte, 0)
+	for i := 0; i < len(room.letters); i++ {
+		if room.letters[i] == '-' {
+			decrypted = append(decrypted, ' ')
+			continue
+		}
+		decrypted_letter := (int(room.letters[i])-97+room.sector_id)%26 + 97
+		decrypted = append(decrypted, byte(decrypted_letter))
+	}
+	return string(decrypted)
 }
 
 func (room Room) valid() bool {
