@@ -27,14 +27,17 @@ func main() {
 		}
 	}
 
-	// find most common letter per column
+	// find most and least common letter per column
 	part1 := make([]rune, 0)
+	part2 := make([]rune, 0)
 	for i := 0; i < len(freqs); i++ {
 		keys := funk.Keys(freqs[i]).([]rune)
 		sort.Slice(keys, func(a, b int) bool {
 			return freqs[i][keys[a]] > freqs[i][keys[b]]
 		})
 		part1 = append(part1, keys[0])
+		part2 = append(part2, keys[len(keys)-1])
 	}
 	log.Print("Part1: ", string(part1))
+	log.Print("Part2: ", string(part2))
 }
