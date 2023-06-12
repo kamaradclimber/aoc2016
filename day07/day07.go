@@ -14,6 +14,7 @@ func main() {
 	lines := strings.Split(string(content), "\n")
 
 	part1 := 0
+	part2 := 0
 
 	for _, line := range lines {
 		ip, err := parseIP(line)
@@ -23,9 +24,13 @@ func main() {
 			if ip.SupportTLS() {
 				part1 += 1
 			}
+			if ip.SupportSSL() {
+				part2 += 1
+			}
 		}
 	}
 	log.Print("Part1:", part1)
+	log.Print("Part2:", part2)
 }
 
 type Part struct {
@@ -35,6 +40,36 @@ type Part struct {
 
 type IP struct {
 	parts []Part
+}
+
+func (ip IP) SupportSSL() bool {
+	// list all ABA sequences in supernet sequences
+	abas := make([]string, 0)
+	for _, part := range ip.parts {
+		if part.hypernet {
+			continue
+		}
+
+		for i := 0; i < len(part.value)-2; i++ {
+			if part.value[i+0] == part.value[i+2] && part.value[i+0] != part.value[i+1] {
+				abas = append(abas, part.value[i:i+3])
+			}
+		}
+	}
+
+	// search them in hypernet parts
+	for _, part := range ip.parts {
+		if part.hypernet {
+			for _, aba := range abas {
+				bab := []byte{aba[1], aba[0], aba[1]}
+				if strings.Contains(part.value, string(bab)) {
+					return true
+				}
+			}
+		}
+	}
+
+	return false
 }
 
 func (ip IP) SupportTLS() bool {
