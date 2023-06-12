@@ -64,20 +64,19 @@ func main() {
 				grid[l][column] = old_column[(l-shift+2*height)%height]
 			}
 		}
-		log.Print(line)
-		printGrid(grid)
-
-		part1 := 0
-		for l := 0; l < len(grid); l++ {
-			for c := 0; c < len(grid[l]); c++ {
-				if grid[l][c] {
-					part1 += 1
-				}
+	}
+	part1 := 0
+	for l := 0; l < len(grid); l++ {
+		for c := 0; c < len(grid[l]); c++ {
+			if grid[l][c] {
+				part1 += 1
 			}
 		}
-		log.Print("Part1: ", part1)
-
 	}
+	log.Print("Part1: ", part1)
+	log.Print("Part2:")
+	printGrid(grid)
+
 }
 
 func printGrid(grid [][]bool) {
@@ -91,5 +90,4 @@ func printGrid(grid [][]bool) {
 		}
 		fmt.Print("\n")
 	}
-	log.Print("---------------------------")
 }
