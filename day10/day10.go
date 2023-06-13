@@ -1,7 +1,7 @@
 package main
 
 import (
-	"fmt"
+	// "fmt"
 	"log"
 	"os"
 	"regexp"
@@ -71,11 +71,13 @@ func main() {
 	simulate := true
 	round := 1
 	for simulate {
-		log.Print("Round ", round)
+		simulate = false
+		//log.Print("Round ", round)
 		round++
 		for bot_id := 0; bot_id < len(bots); bot_id++ {
 			bot := bots[bot_id]
 			if len(bot.chips) == 2 {
+				simulate = true // at least one bot did something
 				// it's so sad golang has no decent library for ints
 				low := bot.chips[0]
 				high := bot.chips[1]
@@ -84,19 +86,19 @@ func main() {
 					high = bot.chips[0]
 				}
 				if low == 17 && high == 61 {
-					log.Print("Bot ", bot_id, " is responsible for the relevant comparison")
-					simulate = false
-					break
+					log.Print("Part1: Bot ", bot_id, " is responsible for the relevant comparison")
+					//simulate = false
+					//break
 				}
 
 				if bot.give_low_to_bot {
-					log.Print(fmt.Sprintf("Bot %d gives %d to bot %d", bot_id, low, bot.give_low_to_bot_id))
+					// log.Print(fmt.Sprintf("Bot %d gives %d to bot %d", bot_id, low, bot.give_low_to_bot_id))
 					bots[bot.give_low_to_bot_id].chips = append(bots[bot.give_low_to_bot_id].chips, low)
 				} else {
 					outputs[bot.give_low_to_output_id] = low
 				}
 				if bot.give_high_to_bot {
-					log.Print(fmt.Sprintf("Bot %d gives %d to bot %d", bot_id, high, bot.give_high_to_bot_id))
+					// log.Print(fmt.Sprintf("Bot %d gives %d to bot %d", bot_id, high, bot.give_high_to_bot_id))
 					bots[bot.give_high_to_bot_id].chips = append(bots[bot.give_high_to_bot_id].chips, high)
 				} else {
 					outputs[bot.give_high_to_output_id] = high
@@ -105,4 +107,6 @@ func main() {
 			}
 		}
 	}
+	part2 := outputs[0] * outputs[1] * outputs[2]
+	log.Print("Part2: ", part2)
 }
