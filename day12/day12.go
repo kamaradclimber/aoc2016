@@ -36,40 +36,46 @@ func main() {
 	if error != nil {
 		log.Fatal(error)
 	}
-	registers := make([]int, 4)
-	registers[0] = 0
-	lines := strings.Split(string(content), "\n")
-	if lines[len(lines)-1] == "" {
-		lines = lines[0 : len(lines)-1]
-	}
 
-	current_line := 0
+	for _, part := range [2]int{1, 2} {
 
-	for current_line < len(lines) {
-		line := lines[current_line]
-		switch line[0:3] {
-		case "cpy":
-			src_value := read_value(registers, line[4:])
-			dst_register := int(lines[current_line][len(line)-1] - 97)
-			registers[dst_register] = src_value
-
-		case "inc":
-			dst_register := int(lines[current_line][len(line)-1] - 97)
-			registers[dst_register] = registers[dst_register] + 1
-		case "dec":
-			dst_register := int(lines[current_line][len(line)-1] - 97)
-			registers[dst_register] = registers[dst_register] - 1
-		case "jnz":
-			if read_value(registers, line[4:]) != 0 {
-				shift := read_number(line[6:])
-				current_line += shift
-				continue
-			}
-		default:
-			log.Fatal(fmt.Sprintf("Invalid instruction %s on line %d", line[0:3], current_line))
+		registers := make([]int, 4)
+		if part == 2 {
+			registers[2] = 1
 		}
-		current_line++
+		lines := strings.Split(string(content), "\n")
+		if lines[len(lines)-1] == "" {
+			lines = lines[0 : len(lines)-1]
+		}
+
+		current_line := 0
+
+		for current_line < len(lines) {
+			line := lines[current_line]
+			switch line[0:3] {
+			case "cpy":
+				src_value := read_value(registers, line[4:])
+				dst_register := int(lines[current_line][len(line)-1] - 97)
+				registers[dst_register] = src_value
+
+			case "inc":
+				dst_register := int(lines[current_line][len(line)-1] - 97)
+				registers[dst_register] = registers[dst_register] + 1
+			case "dec":
+				dst_register := int(lines[current_line][len(line)-1] - 97)
+				registers[dst_register] = registers[dst_register] - 1
+			case "jnz":
+				if read_value(registers, line[4:]) != 0 {
+					shift := read_number(line[6:])
+					current_line += shift
+					continue
+				}
+			default:
+				log.Fatal(fmt.Sprintf("Invalid instruction %s on line %d", line[0:3], current_line))
+			}
+			current_line++
+		}
+		log.Printf("Part%d: %d", part, registers[0])
 	}
-	log.Printf("Part1: %d", registers[0])
 
 }
