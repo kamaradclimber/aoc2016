@@ -39,3 +39,10 @@ func TestExtractChunksMultipleChunks(t *testing.T) {
     t.Fatalf(`Expected to find two chunks, found %v instead`, chunks)
   }
 }
+
+func TestHashPart1(t *testing.T) {
+  hash := Hash("abc", 0, 2016)
+  if hash != "a107ff634856bb300138cac6568c0f24" {
+    t.Fatalf(`Expected to find the correct hash but found %s instead`, hash)
+  }
+}

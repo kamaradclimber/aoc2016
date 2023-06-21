@@ -7,11 +7,14 @@ import (
 	"log"
 )
 
-func hash(i int) string {
-	salt := "qzyelonm"
-	h := md5.New()
-	io.WriteString(h, fmt.Sprintf("%s%d", salt, i))
-	return fmt.Sprintf("%x", h.Sum(nil))
+func Hash(salt string, i int, stretches int) string {
+	input := fmt.Sprintf("%s%d", salt, i)
+	for i := 0; i <= stretches; i++ {
+		h := md5.New()
+		io.WriteString(h, input)
+		input = fmt.Sprintf("%x", h.Sum(nil))
+	}
+	return input
 }
 
 type Hashes struct {
@@ -25,11 +28,11 @@ func NewHashes() Hashes {
 	return h
 }
 
-func (h *Hashes) get(i int) string {
+func (h *Hashes) get(i int, stretches int) string {
 	for j := len(h.hashes); j < 1+i/1000; j++ {
 		var block [1000]string
 		for k := 0; k < 1000; k++ {
-			block[k] = hash(j*1000 + k)
+			block[k] = Hash("qzyelonm", j*1000+k, stretches)
 
 			for _, rune := range ExtractChunks(block[k], 5) {
 				h.index_of_quintuples[rune] = append(h.index_of_quintuples[rune], j*1000+k)
@@ -60,19 +63,20 @@ func ExtractChunks(s string, n int) []rune {
 }
 
 func main() {
-	log.Printf("Part1: %d", buildOneTimePad())
+	log.Printf("Part1: %d", buildOneTimePad(0))
+	log.Printf("Part2: %d", buildOneTimePad(2016))
 }
 
-func buildOneTimePad() int {
+func buildOneTimePad(stretches int) int {
 	h := NewHashes()
 
 	found_keys := 0
 	i := 0
 	for {
 		// invoke i-th hash to make sure it exist. They are lazyly computed and treated
-		h.get(i + 1000)
+		h.get(i+1000, stretches)
 
-		for _, rune := range ExtractChunks(h.get(i), 3) {
+		for _, rune := range ExtractChunks(h.get(i, stretches), 3) {
 			for _, index := range h.index_of_quintuples[rune] {
 				if index <= i {
 					continue
@@ -81,7 +85,7 @@ func buildOneTimePad() int {
 					break
 				}
 				found_keys += 1
-				// log.Printf("Found %d-th key %s at index %d (%s) because at index %d we have %s", found_keys, string(rune), i, h.get(i), index, h.get(index))
+				log.Printf("Found %d-th key %s at index %d (%s) because at index %d we have %s", found_keys, string(rune), i, h.get(i, stretches), index, h.get(index, stretches))
 				if found_keys >= 64 {
 					return i
 				}
