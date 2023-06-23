@@ -45,7 +45,15 @@ func main() {
 	log.Printf("We have %d discs", len(discs))
 
 	// this looks like chinese reminder theorem
+	solution := chineese_reminder(discs)
+	log.Printf("Part1: %d", solution)
 
+	discs = append(discs, Disc{11, 0})
+	solution = chineese_reminder(discs)
+	log.Printf("Part2: %d", solution)
+}
+
+func chineese_reminder(discs []Disc) int {
 	n_hats := make([]int, len(discs))
 	for i := 0; i < len(n_hats); i++ {
 		product := 1
@@ -79,7 +87,7 @@ func main() {
 		full_product *= discs[i].nb_positions
 	}
 	solution = real_modulo(solution, full_product)
-	log.Printf("Part1: %d", solution)
+	return solution
 
 }
 
